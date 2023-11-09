@@ -1,0 +1,27 @@
+name: PowerShell Test Script
+
+on: [push]
+
+jobs:
+  run-powershell:
+    runs-on: windows-latest  # Use a Windows runner to execute PowerShell script
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Execute PowerShell Script
+      run: .\Test.ps1
+      shell: pwsh  # Ensures PowerShell Core is used
+
+    - name: Send Email Notification
+      if: always()  # This ensures that the email step runs even if the previous step fails
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: mailcluster.loopia.se
+        server_port: 587
+        username: richard@metavision.se 
+        password: WWars_Richard
+        subject: Plupp GitHub Action Result
+        body: The plupp result of the GitHub Action is ${{ job.status }}.
+        to: richard@metavision.se
+        from: GitHub Actions <nopreply@github.com>
