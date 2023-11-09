@@ -3,12 +3,28 @@ name: PowerShell Test Script
 on: [push]
 
 jobs:
-  run-powershell:
-    runs-on: windows-latest  # Use a Windows runner to execute PowerShell script
+  checkout_repo:
+    runs-on: windows-latest
+    outputs:
+      repoPath: ${{ steps.checkout_repo.outputs.repo-path }}
     steps:
     - name: Checkout Repository
+      id: checkout_repo
       uses: actions/checkout@v2
+    - name: Upload repo content as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: repo-content
+        path: ${{ github.workspace }}
 
+  run-powershell-1:
+    needs: checkout_repo
+    runs-on: windows-latest
+    steps:
+    - name: Download repo content
+      uses: actions/download-artifact@v2
+      with:
+        name: repo-content
     - name: Execute PowerShell Script
       run: .\Test.ps1
       shell: pwsh  # Ensures PowerShell Core is used
@@ -25,3 +41,15 @@ jobs:
         body: The plupp result of the GitHub Action is ${{ job.status }}.
         to: richard@metavision.se
         from: GitHub Actions <nopreply@github.com>
+
+  run-powershell-2:
+    needs: checkout_repo
+    runs-on: windows-latest
+    steps:
+    - name: Download repo content
+      uses: actions/download-artifact@v2
+      with:
+        name: repo-content
+    - name: Execute PowerShell Script 2
+      run: .\Test2.ps1
+      shell: pwsh

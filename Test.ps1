@@ -1,2 +1,1 @@
-ECHO "Muffin"
-fdsafdsa
+ECHO "Muffin 1"
